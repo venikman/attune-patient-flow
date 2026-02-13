@@ -1,10 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users } from "lucide-react";
+import { LayoutDashboard, Users, Shield, ArrowLeftRight, FileText, Target, Grid3X3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/patients", label: "Patient Panel", icon: Users },
+  { to: "/patients", label: "Patients", icon: Users },
+  { to: "/roster-passport", label: "Passport", icon: Shield },
+  { to: "/delta-ledger", label: "Delta Ledger", icon: ArrowLeftRight },
+  { to: "/bundle-card", label: "Bundle Card", icon: FileText },
+  { to: "/pareto-planner", label: "Pareto", icon: Target },
+  { to: "/nqd-map", label: "NQD Map", icon: Grid3X3 },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
