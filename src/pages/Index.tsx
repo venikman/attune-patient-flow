@@ -1,12 +1,24 @@
-import { Users, TrendingUp, TrendingDown, UserPlus, UserMinus } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, TrendingUp, TrendingDown, UserPlus, UserMinus, AlertTriangle, Clock } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { allMembers, summaryStats } from "@/data/mock-data";
+import { allMembers, summaryStats, projectedMembers } from "@/data/mock-data";
 import { Link } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const newMembers = allMembers.filter((m) => m.status === "new");
 const removedMembers = allMembers.filter((m) => m.status === "removed");
+const atRiskMembers = projectedMembers.filter((m) => m.type === "at-risk-removal");
+const expectedAdds = projectedMembers.filter((m) => m.type === "expected-add");
+
+const confidenceBadge = (confidence: "High" | "Medium" | "Low") => {
+  const styles = {
+    High: "bg-destructive/10 text-destructive",
+    Medium: "bg-chart-4/20 text-chart-4",
+    Low: "bg-muted text-muted-foreground",
+  };
+  return <Badge className={`${styles[confidence]} border-0 text-xs`}>{confidence}</Badge>;
+};
 
 export default function Index() {
   return (
@@ -37,9 +49,8 @@ export default function Index() {
         </div>
       </div>
 
-      {/* Two tables side by side */}
+      {/* This Month: Added & Removed */}
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Added */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
@@ -76,7 +87,6 @@ export default function Index() {
           </CardContent>
         </Card>
 
-        {/* Removed */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
@@ -112,6 +122,108 @@ export default function Index() {
             </Table>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Next Month Projections */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Clock className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">March 2025 Projections</h2>
+          <Badge variant="outline" className="text-xs">Estimated</Badge>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card className="border-dashed">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                At-Risk Removals ({atRiskMembers.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <TooltipProvider>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Patient</TableHead>
+                      <TableHead>Risk Reason</TableHead>
+                      <TableHead className="text-right">Conf.</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {atRiskMembers.map((m) => (
+                      <TableRow key={m.id}>
+                        <TableCell>
+                          <span className="font-medium">{m.lastName}, {m.firstName}</span>
+                          <span className="ml-1 text-xs text-muted-foreground">{m.age}{m.gender[0]}</span>
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="text-sm cursor-help border-b border-dotted border-muted-foreground/50">
+                                {m.reason}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="max-w-xs">
+                              <p className="text-xs font-medium mb-1">Evidence</p>
+                              <p className="text-xs">{m.evidence}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell className="text-right">{confidenceBadge(m.confidence)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TooltipProvider>
+            </CardContent>
+          </Card>
+
+          <Card className="border-dashed">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <UserPlus className="h-4 w-4 text-primary" />
+                Expected Adds ({expectedAdds.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <TooltipProvider>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Patient</TableHead>
+                      <TableHead>Reason</TableHead>
+                      <TableHead className="text-right">Conf.</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {expectedAdds.map((m) => (
+                      <TableRow key={m.id}>
+                        <TableCell>
+                          <span className="font-medium">{m.lastName}, {m.firstName}</span>
+                          <span className="ml-1 text-xs text-muted-foreground">{m.age}{m.gender[0]}</span>
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="text-sm cursor-help border-b border-dotted border-muted-foreground/50">
+                                {m.reason}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="max-w-xs">
+                              <p className="text-xs font-medium mb-1">Evidence</p>
+                              <p className="text-xs">{m.evidence}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell className="text-right">{confidenceBadge(m.confidence)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TooltipProvider>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
