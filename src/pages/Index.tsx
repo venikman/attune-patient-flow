@@ -109,12 +109,15 @@ export default function Index() {
         </div>
 
         {/* Projections */}
-        <div className="rounded-lg border border-dashed bg-accent/30 p-3">
-          <h3 className="flex items-center gap-1.5 text-sm font-medium mb-3">
-            <Clock className="h-3.5 w-3.5 text-primary" />
-            March Projections
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 ml-1 border-primary/30 text-primary">Est.</Badge>
-          </h3>
+        <div className="rounded-lg border-2 border-dashed border-primary/30 bg-accent/40 p-4 relative">
+          <div className="flex items-center gap-2 mb-4">
+            <Clock className="h-4 w-4 text-primary" />
+            <h3 className="text-base font-semibold">March Projections</h3>
+            <Badge variant="outline" className="text-xs px-2 py-0.5 border-primary/40 text-primary bg-primary/10 font-medium">
+              Est.
+            </Badge>
+            <span className="text-xs text-muted-foreground ml-auto">Based on historical trends &amp; signals</span>
+          </div>
           <div className="grid gap-3 lg:grid-cols-2">
             {/* At-Risk */}
             <div className="rounded-md bg-destructive/5 border border-destructive/15 p-2">
