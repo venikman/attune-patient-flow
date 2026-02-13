@@ -113,7 +113,7 @@ export default function Index() {
           <div className="flex items-center gap-2 mb-4">
             <Clock className="h-4 w-4 text-primary" />
             <h3 className="text-base font-semibold">March Projections</h3>
-            <Badge variant="outline" className="text-xs px-2 py-0.5 border-primary/40 text-primary bg-primary/10 font-medium">
+            <Badge variant="outline" className="text-xs px-2 py-0.5 border-primary/40 text-primary bg-primary/10 font-medium pulse">
               Est.
             </Badge>
             <span className="text-xs text-muted-foreground ml-auto">Based on historical trends &amp; signals</span>
