@@ -171,6 +171,37 @@ export const summaryStats = {
 export const allProviders = providers;
 export const allPlans = plans;
 
+export type ProjectionType = "at-risk-removal" | "expected-add";
+
+export interface ProjectedMember {
+  id: string;
+  memberId: string;
+  firstName: string;
+  lastName: string;
+  age: number;
+  gender: "Male" | "Female";
+  provider: Provider;
+  plan: Plan;
+  type: ProjectionType;
+  reason: string;
+  evidence: string;
+  confidence: "High" | "Medium" | "Low";
+}
+
+export const projectedMembers: ProjectedMember[] = [
+  // At-risk removals
+  { id: "m-004", memberId: "MBR-10237", firstName: "Linda", lastName: "Davis", age: 70, gender: "Female", provider: providers[0], plan: plans[0], type: "at-risk-removal", reason: "Coverage expiring", evidence: "Attribution period ends 2025-06-30; no renewal filed as of cutoff", confidence: "High" },
+  { id: "m-007", memberId: "MBR-10240", firstName: "William", lastName: "Wilson", age: 72, gender: "Male", provider: providers[1], plan: plans[2], type: "at-risk-removal", reason: "No-show pattern", evidence: "3 consecutive missed appointments (Nov, Dec, Jan); historically correlates with 78% disenrollment", confidence: "High" },
+  { id: "m-017", memberId: "MBR-10250", firstName: "Thomas", lastName: "Martinez", age: 39, gender: "Male", provider: providers[0], plan: plans[0], type: "at-risk-removal", reason: "PCP change request", evidence: "Member submitted PCP change form on 2025-01-28; pending reassignment", confidence: "Medium" },
+  { id: "m-030", memberId: "MBR-10263", firstName: "Ruth", lastName: "Hill", age: 68, gender: "Female", provider: providers[2], plan: plans[1], type: "at-risk-removal", reason: "Address change out of area", evidence: "Updated address on file is outside service area (zip 95959); awaiting payer confirmation", confidence: "Medium" },
+  { id: "m-012", memberId: "MBR-10245", firstName: "Susan", lastName: "White", age: 64, gender: "Female", provider: providers[1], plan: plans[0], type: "at-risk-removal", reason: "Premium non-payment", evidence: "2 months overdue on premium; grace period ends 2025-03-01", confidence: "Low" },
+  // Expected adds
+  { id: "proj-001", memberId: "MBR-10284", firstName: "Angela", lastName: "Rivera", age: 52, gender: "Female", provider: providers[0], plan: plans[0], type: "expected-add", reason: "Pending enrollment", evidence: "Application received 2025-01-20; eligibility verified; effective date 2025-03-01", confidence: "High" },
+  { id: "proj-002", memberId: "MBR-10285", firstName: "Peter", lastName: "Nguyen", age: 61, gender: "Male", provider: providers[1], plan: plans[1], type: "expected-add", reason: "Algorithm-based attribution", evidence: "Plurality-of-care algorithm assigns to Dr. Wilson based on 4 of 6 recent visits", confidence: "High" },
+  { id: "proj-003", memberId: "MBR-10286", firstName: "Marie", lastName: "Foster", age: 44, gender: "Female", provider: providers[2], plan: plans[2], type: "expected-add", reason: "PCP selection", evidence: "Member selected Dr. Garcia via payer portal on 2025-02-05; pending next attribution run", confidence: "Medium" },
+  { id: "proj-004", memberId: "MBR-10287", firstName: "Harold", lastName: "Brooks", age: 73, gender: "Male", provider: providers[0], plan: plans[0], type: "expected-add", reason: "Returning member", evidence: "Previously attributed Jul-Dec 2024; re-enrolled in same plan effective 2025-03-01", confidence: "Medium" },
+];
+
 export function getMemberById(id: string): Member | undefined {
   return allMembers.find(m => m.id === id);
 }
