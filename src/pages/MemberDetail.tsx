@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMemberById, type ChangeType } from "@/data/mock-data";
+import { FhirInspector } from "@/components/FhirInspector";
+import { memberToFhirBundle } from "@/lib/fhir-transforms";
 
 const changeTypeColors: Record<ChangeType, string> = {
   nochange: "bg-primary/10 text-primary border-0",
@@ -133,6 +135,11 @@ export default function MemberDetail() {
           </div>
         </CardContent>
       </Card>
+
+      <FhirInspector
+        data={memberToFhirBundle(member)}
+        title="FHIR Inspector — Member Bundle (Patient, Coverage, Practitioner)"
+      />
     </div>
   );
 }
