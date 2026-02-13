@@ -106,29 +106,29 @@ export default function Index() {
         </div>
 
         {/* Projections */}
-        <div className="rounded-lg border border-dashed bg-card/50 p-3">
-          <h3 className="flex items-center gap-1.5 text-sm font-medium mb-2">
-            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+        <div className="rounded-lg border border-dashed bg-accent/30 p-3">
+          <h3 className="flex items-center gap-1.5 text-sm font-medium mb-3">
+            <Clock className="h-3.5 w-3.5 text-primary" />
             March Projections
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 ml-1">Est.</Badge>
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 ml-1 border-primary/30 text-primary">Est.</Badge>
           </h3>
           <div className="grid gap-3 lg:grid-cols-2">
             {/* At-Risk */}
-            <div>
-              <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3 text-destructive" /> At-Risk ({atRiskMembers.length})
+            <div className="rounded-md bg-destructive/5 border border-destructive/15 p-2">
+              <p className="text-xs font-medium text-destructive mb-1.5 flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" /> At-Risk Removals ({atRiskMembers.length})
               </p>
               <Table>
                 <TableBody>
                   {atRiskMembers.map((m) => (
-                    <TableRow key={m.id} className="text-sm">
+                    <TableRow key={m.id} className="text-sm border-destructive/10">
                       <TableCell className="py-1">
                         <span className="font-medium text-sm">{m.lastName}, {m.firstName}</span>
                       </TableCell>
                       <TableCell className="py-1">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="text-xs cursor-help border-b border-dotted border-muted-foreground/40">{m.reason}</span>
+                            <span className="text-xs cursor-help border-b border-dotted border-destructive/40 text-destructive/80">{m.reason}</span>
                           </TooltipTrigger>
                           <TooltipContent side="bottom" className="max-w-xs"><p className="text-xs">{m.evidence}</p></TooltipContent>
                         </Tooltip>
@@ -141,21 +141,21 @@ export default function Index() {
             </div>
 
             {/* Expected Adds */}
-            <div>
-              <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
-                <UserPlus className="h-3 w-3 text-primary" /> Expected ({expectedAdds.length})
+            <div className="rounded-md bg-primary/5 border border-primary/15 p-2">
+              <p className="text-xs font-medium text-primary mb-1.5 flex items-center gap-1">
+                <UserPlus className="h-3 w-3" /> Expected Adds ({expectedAdds.length})
               </p>
               <Table>
                 <TableBody>
                   {expectedAdds.map((m) => (
-                    <TableRow key={m.id} className="text-sm">
+                    <TableRow key={m.id} className="text-sm border-primary/10">
                       <TableCell className="py-1">
                         <span className="font-medium text-sm">{m.lastName}, {m.firstName}</span>
                       </TableCell>
                       <TableCell className="py-1">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="text-xs cursor-help border-b border-dotted border-muted-foreground/40">{m.reason}</span>
+                            <span className="text-xs cursor-help border-b border-dotted border-primary/40 text-primary/80">{m.reason}</span>
                           </TooltipTrigger>
                           <TooltipContent side="bottom" className="max-w-xs"><p className="text-xs">{m.evidence}</p></TooltipContent>
                         </Tooltip>
