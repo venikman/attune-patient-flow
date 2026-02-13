@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Code, Copy, Check, ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,73 @@ interface FhirInspectorProps {
   title?: string;
 }
 
+function highlightJson(json: string): React.ReactNode[] {
+  const lines = json.split("\n");
+  return lines.map((line, i) => {
+    const parts: React.ReactNode[] = [];
+    let remaining = line;
+    let key = 0;
+
+    // Match patterns: keys, strings, numbers, booleans, null
+    const regex = /("(?:\\.|[^"\\])*")\s*:|("(?:\\.|[^"\\])*")|((?:-?\d+\.?\d*(?:[eE][+-]?\d+)?))|(\btrue\b|\bfalse\b)|(\bnull\b)/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(line)) !== null) {
+      // Add any plain text before this match
+      if (match.index > lastIndex) {
+        parts.push(<span key={key++}>{line.slice(lastIndex, match.index)}</span>);
+      }
+
+      if (match[1] !== undefined) {
+        // Key (quoted string followed by colon)
+        parts.push(
+          <span key={key++} className="text-chart-1">{match[1]}</span>
+        );
+        parts.push(<span key={key++}>:</span>);
+      } else if (match[2] !== undefined) {
+        // String value
+        parts.push(
+          <span key={key++} className="text-chart-4">{match[2]}</span>
+        );
+      } else if (match[3] !== undefined) {
+        // Number
+        parts.push(
+          <span key={key++} className="text-chart-2">{match[3]}</span>
+        );
+      } else if (match[4] !== undefined) {
+        // Boolean
+        parts.push(
+          <span key={key++} className="text-chart-5">{match[4]}</span>
+        );
+      } else if (match[5] !== undefined) {
+        // Null
+        parts.push(
+          <span key={key++} className="text-muted-foreground">{match[5]}</span>
+        );
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < line.length) {
+      parts.push(<span key={key++}>{line.slice(lastIndex)}</span>);
+    }
+
+    return (
+      <div key={i} className="leading-relaxed">
+        {parts.length > 0 ? parts : line}
+      </div>
+    );
+  });
+}
+
 export function FhirInspector({ data, title = "FHIR Inspector" }: FhirInspectorProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const json = JSON.stringify(data, null, 2);
+  const highlighted = useMemo(() => highlightJson(json), [json]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(json);
@@ -39,8 +101,8 @@ export function FhirInspector({ data, title = "FHIR Inspector" }: FhirInspectorP
           >
             {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5" />}
           </Button>
-          <pre className="overflow-x-auto p-4 text-xs leading-relaxed font-mono bg-muted/50 max-h-[500px] overflow-y-auto">
-            {json}
+          <pre className="overflow-x-auto p-4 text-xs font-mono bg-muted/50 max-h-[500px] overflow-y-auto">
+            {highlighted}
           </pre>
         </div>
       </CollapsibleContent>
