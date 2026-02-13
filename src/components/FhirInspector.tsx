@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { Code, Copy, Check, ChevronDown, ChevronRight, Search, X } from "lucide-react";
+import { Code, Copy, Check, ChevronDown, ChevronRight, Search, X, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ interface JsonNodeProps {
   defaultExpanded?: boolean;
   searchTerm: string;
   isLast: boolean;
+  forceState?: "expanded" | "collapsed" | null;
 }
 
 function matchesSearch(value: unknown, search: string): boolean {
@@ -48,10 +49,19 @@ function highlightText(text: string, search: string, className: string) {
   );
 }
 
-function JsonNode({ keyName, value, depth, defaultExpanded = true, searchTerm, isLast }: JsonNodeProps) {
+function JsonNode({ keyName, value, depth, defaultExpanded = true, searchTerm, isLast, forceState }: JsonNodeProps) {
   const isExpandable = (typeof value === "object" && value !== null);
   const shouldAutoExpand = searchTerm ? matchesSearch(value, searchTerm) : defaultExpanded;
   const [expanded, setExpanded] = useState(shouldAutoExpand);
+
+  // Handle force expand/collapse
+  const [prevForce, setPrevForce] = useState(forceState);
+  if (prevForce !== forceState && forceState) {
+    setPrevForce(forceState);
+    setExpanded(forceState === "expanded");
+  } else if (prevForce !== forceState) {
+    setPrevForce(forceState);
+  }
 
   // Re-expand when search changes
   const [prevSearch, setPrevSearch] = useState(searchTerm);
@@ -150,6 +160,7 @@ function JsonNode({ keyName, value, depth, defaultExpanded = true, searchTerm, i
                   defaultExpanded={depth < 2}
                   searchTerm={searchTerm}
                   isLast={i === count - 1}
+                  forceState={forceState}
                 />
               ))
             : Object.entries(value as Record<string, unknown>).map(([k, v], i) => (
@@ -161,6 +172,7 @@ function JsonNode({ keyName, value, depth, defaultExpanded = true, searchTerm, i
                   defaultExpanded={depth < 2}
                   searchTerm={searchTerm}
                   isLast={i === count - 1}
+                  forceState={forceState}
                 />
               ))}
           <div style={{ paddingLeft: indent }} className="leading-6">
@@ -176,6 +188,8 @@ export function FhirInspector({ data, title = "FHIR Inspector" }: FhirInspectorP
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [forceCounter, setForceCounter] = useState(0);
+  const [forceState, setForceState] = useState<"expanded" | "collapsed" | null>(null);
 
   const json = JSON.stringify(data, null, 2);
 
@@ -184,6 +198,19 @@ export function FhirInspector({ data, title = "FHIR Inspector" }: FhirInspectorP
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handleExpandAll = () => {
+    setForceState("expanded");
+    setForceCounter((c) => c + 1);
+  };
+
+  const handleCollapseAll = () => {
+    setForceState("collapsed");
+    setForceCounter((c) => c + 1);
+  };
+
+  // Use counter as key suffix to force re-propagation
+  const forceKey = `${forceState}-${forceCounter}`;
 
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="mt-8 rounded-lg border bg-card">
@@ -209,17 +236,38 @@ export function FhirInspector({ data, title = "FHIR Inspector" }: FhirInspectorP
                 <X className="h-3 w-3" />
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 shrink-0"
-              onClick={handleCopy}
-            >
-              {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5" />}
-            </Button>
+            <div className="flex items-center gap-0.5 shrink-0 border-l pl-2 ml-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={handleExpandAll}
+                title="Expand all"
+              >
+                <ChevronsUpDown className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={handleCollapseAll}
+                title="Collapse all"
+              >
+                <ChevronsDownUp className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={handleCopy}
+                title="Copy JSON"
+              >
+                {copied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5" />}
+              </Button>
+            </div>
           </div>
           <pre className="overflow-x-auto p-4 text-xs font-mono bg-muted/50 max-h-[500px] overflow-y-auto">
-            <JsonNode value={data} depth={0} defaultExpanded={true} searchTerm={searchTerm} isLast={true} />
+            <JsonNode key={forceKey} value={data} depth={0} defaultExpanded={true} searchTerm={searchTerm} isLast={true} forceState={forceState} />
           </pre>
         </div>
       </CollapsibleContent>
