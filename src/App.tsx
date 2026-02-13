@@ -7,7 +7,6 @@ import { AppLayout } from "@/components/AppLayout";
 import Index from "./pages/Index";
 import PatientPanel from "./pages/PatientPanel";
 import MemberDetail from "./pages/MemberDetail";
-import MonthlyChanges from "./pages/MonthlyChanges";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,7 +22,6 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/patients" element={<PatientPanel />} />
             <Route path="/patients/:id" element={<MemberDetail />} />
-            <Route path="/changes" element={<MonthlyChanges />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>
