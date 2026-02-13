@@ -5,8 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { UserPlus, UserMinus, ArrowLeftRight } from "lucide-react";
 import { allMembers, summaryStats } from "@/data/mock-data";
 
-const newMembers = allMembers.filter((m) => m.status === "new");
-const removedMembers = allMembers.filter((m) => m.status === "removed");
+const newMembers = allMembers.filter((m) => m.changeType === "new");
+const removedMembers = allMembers.filter((m) => m.changeType === "dropped");
 
 export default function MonthlyChanges() {
   return (
