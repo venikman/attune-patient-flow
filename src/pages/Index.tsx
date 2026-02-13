@@ -1,4 +1,7 @@
 import { Users, TrendingUp, TrendingDown, UserPlus, UserMinus, AlertTriangle, Clock } from "lucide-react";
+import { FhirInspector } from "@/components/FhirInspector";
+import { membersToAtrGroup } from "@/lib/fhir-transforms";
+import { attributionList } from "@/data/mock-data";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { allMembers, summaryStats, projectedMembers } from "@/data/mock-data";
@@ -168,6 +171,11 @@ export default function Index() {
             </div>
           </div>
         </div>
+
+        <FhirInspector
+          data={membersToAtrGroup([...newMembers, ...removedMembers], attributionList)}
+          title="FHIR Inspector — ATR Group (This Month's Changes)"
+        />
       </div>
     </TooltipProvider>
   );

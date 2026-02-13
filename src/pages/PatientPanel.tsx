@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { allMembers, allProviders, allPlans, type ChangeType } from "@/data/mock-data";
+import { allMembers, allProviders, allPlans, attributionList, type ChangeType } from "@/data/mock-data";
+import { FhirInspector } from "@/components/FhirInspector";
+import { membersToAtrGroup } from "@/lib/fhir-transforms";
 
 const changeTypeConfig: Record<ChangeType, { label: string; className: string }> = {
   nochange: { label: "Active", className: "bg-primary/10 text-primary border-0" },
@@ -122,6 +124,11 @@ export default function PatientPanel() {
           </TableBody>
         </Table>
       </div>
+
+      <FhirInspector
+        data={membersToAtrGroup(filtered, attributionList)}
+        title="FHIR Inspector — ATR Group (Filtered Panel)"
+      />
     </div>
   );
 }
