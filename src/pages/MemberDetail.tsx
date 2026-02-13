@@ -3,14 +3,20 @@ import { ArrowLeft, User, Building2, Shield, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { getMemberById } from "@/data/mock-data";
+import { getMemberById, type ChangeType } from "@/data/mock-data";
 
-const statusColors: Record<string, string> = {
-  active: "bg-primary/10 text-primary border-0",
+const changeTypeColors: Record<ChangeType, string> = {
+  nochange: "bg-primary/10 text-primary border-0",
   new: "bg-primary/20 text-primary border-0 font-semibold",
-  removed: "bg-destructive/10 text-destructive border-0",
-  pending: "bg-muted/50 text-muted-foreground border-0",
+  dropped: "bg-destructive/10 text-destructive border-0",
+  changed: "bg-chart-4/20 text-chart-4 border-0",
+};
+
+const changeTypeLabels: Record<ChangeType, string> = {
+  nochange: "Active",
+  new: "New",
+  dropped: "Dropped",
+  changed: "Changed",
 };
 
 export default function MemberDetail() {
@@ -35,7 +41,8 @@ export default function MemberDetail() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold">{member.lastName}, {member.firstName}</h1>
-            <Badge className={statusColors[member.status]}>{member.status.charAt(0).toUpperCase() + member.status.slice(1)}</Badge>
+            <Badge className={changeTypeColors[member.changeType]}>{changeTypeLabels[member.changeType]}</Badge>
+            {member.inactive && <Badge variant="outline" className="text-xs">Inactive</Badge>}
           </div>
           <p className="text-muted-foreground">{member.memberId} · {member.age} yrs · {member.gender}</p>
         </div>
@@ -71,7 +78,7 @@ export default function MemberDetail() {
           </CardContent>
         </Card>
 
-        {/* Provider */}
+        {/* Attributed Provider (ext-attributedProvider) */}
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
             <Building2 className="h-4 w-4 text-primary" />
@@ -80,23 +87,28 @@ export default function MemberDetail() {
           <CardContent className="space-y-2 text-sm">
             <Row label="Name" value={member.provider.name} />
             <Row label="NPI" value={member.provider.npi} />
+            <Row label="NPI System" value="http://hl7.org/fhir/sid/us-npi" />
             <Row label="TIN" value={member.provider.tin} />
+            <Row label="TIN System" value="urn:oid:2.16.840.1.113883.4.4" />
             <Row label="Specialty" value={member.provider.specialty} />
           </CardContent>
         </Card>
 
-        {/* Coverage */}
+        {/* Coverage (ext-coverageReference) */}
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
             <Shield className="h-4 w-4 text-primary" />
             <CardTitle className="text-base">Coverage</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
+            <Row label="Coverage ID" value={member.coverage.coverageId} />
             <Row label="Plan" value={member.plan.name} />
             <Row label="Payer" value={member.plan.payer} />
-            <Row label="Contract" value={member.plan.contractId} />
-            <Row label="Subscriber ID" value={member.subscriberId} />
-            <Row label="Period" value={`${member.attributionPeriodStart} — ${member.attributionPeriodEnd}`} />
+            <Row label="Contract ID" value={member.plan.contractId} />
+            <Row label="Subscriber ID" value={member.coverage.subscriberId} />
+            <Row label="Member ID" value={member.coverage.memberId} />
+            <Row label="Attribution Period" value={`${member.attributionPeriodStart} — ${member.attributionPeriodEnd}`} />
+            <Row label="Contract Validity" value={`${member.plan.contractValidityPeriod.start} — ${member.plan.contractValidityPeriod.end}`} />
           </CardContent>
         </Card>
       </div>

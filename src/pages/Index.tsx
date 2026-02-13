@@ -5,8 +5,8 @@ import { allMembers, summaryStats, projectedMembers } from "@/data/mock-data";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const newMembers = allMembers.filter((m) => m.status === "new");
-const removedMembers = allMembers.filter((m) => m.status === "removed");
+const newMembers = allMembers.filter((m) => m.changeType === "new");
+const removedMembers = allMembers.filter((m) => m.changeType === "dropped");
 const atRiskMembers = projectedMembers.filter((m) => m.type === "at-risk-removal");
 const expectedAdds = projectedMembers.filter((m) => m.type === "expected-add");
 

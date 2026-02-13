@@ -5,24 +5,24 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { allMembers, allProviders, allPlans, type AttributionStatus } from "@/data/mock-data";
+import { allMembers, allProviders, allPlans, type ChangeType } from "@/data/mock-data";
 
-const statusConfig: Record<AttributionStatus, { label: string; className: string }> = {
-  active: { label: "Active", className: "bg-primary/10 text-primary border-0" },
+const changeTypeConfig: Record<ChangeType, { label: string; className: string }> = {
+  nochange: { label: "Active", className: "bg-primary/10 text-primary border-0" },
   new: { label: "New", className: "bg-primary/20 text-primary border-0 font-semibold" },
-  removed: { label: "Removed", className: "bg-destructive/10 text-destructive border-0" },
-  pending: { label: "Pending", className: "bg-muted/50 text-muted-foreground border-0" },
+  dropped: { label: "Dropped", className: "bg-destructive/10 text-destructive border-0" },
+  changed: { label: "Changed", className: "bg-chart-4/20 text-chart-4 border-0" },
 };
 
 export default function PatientPanel() {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [changeTypeFilter, setChangeTypeFilter] = useState<string>("all");
   const [planFilter, setPlanFilter] = useState<string>("all");
   const [providerFilter, setProviderFilter] = useState<string>("all");
 
   const filtered = useMemo(() => {
     return allMembers.filter((m) => {
-      if (statusFilter !== "all" && m.status !== statusFilter) return false;
+      if (changeTypeFilter !== "all" && m.changeType !== changeTypeFilter) return false;
       if (planFilter !== "all" && m.plan.contractId !== planFilter) return false;
       if (providerFilter !== "all" && m.provider.npi !== providerFilter) return false;
       if (search) {
@@ -35,7 +35,7 @@ export default function PatientPanel() {
       }
       return true;
     });
-  }, [search, statusFilter, planFilter, providerFilter]);
+  }, [search, changeTypeFilter, planFilter, providerFilter]);
 
   return (
     <div className="space-y-6">
@@ -55,13 +55,13 @@ export default function PatientPanel() {
             className="pl-9"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[150px]"><SelectValue placeholder="Status" /></SelectTrigger>
+        <Select value={changeTypeFilter} onValueChange={setChangeTypeFilter}>
+          <SelectTrigger className="w-[150px]"><SelectValue placeholder="Change Type" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="new">New This Month</SelectItem>
-            <SelectItem value="removed">Removed</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="nochange">Active (nochange)</SelectItem>
+            <SelectItem value="new">New</SelectItem>
+            <SelectItem value="dropped">Dropped</SelectItem>
           </SelectContent>
         </Select>
         <Select value={planFilter} onValueChange={setPlanFilter}>
@@ -94,7 +94,7 @@ export default function PatientPanel() {
               <TableHead className="hidden md:table-cell">Provider</TableHead>
               <TableHead className="hidden lg:table-cell">Plan</TableHead>
               <TableHead className="hidden lg:table-cell">Period</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Change Type</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -113,8 +113,8 @@ export default function PatientPanel() {
                   {m.attributionPeriodStart} — {m.attributionPeriodEnd}
                 </TableCell>
                 <TableCell>
-                  <Badge className={statusConfig[m.status].className}>
-                    {statusConfig[m.status].label}
+                  <Badge className={changeTypeConfig[m.changeType].className}>
+                    {changeTypeConfig[m.changeType].label}
                   </Badge>
                 </TableCell>
               </TableRow>
