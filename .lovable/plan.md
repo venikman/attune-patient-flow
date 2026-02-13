@@ -1,55 +1,35 @@
 
-# Da Vinci ATR Provider Attribution Dashboard
 
-## Overview
-A provider-facing dashboard that visualizes a Member Attribution List with realistic FHIR-aligned mock data. The app shows the current attributed patient panel, key summary metrics, and highlights month-over-month changes (new members, removed members, and reasons for changes).
+# FHIR Inspector Component
 
-## Pages & Features
+Add an expandable "FHIR Inspector" section at the bottom of each page (Dashboard, Patient Panel, Member Detail) that shows the raw FHIR-compliant JSON representation of the data currently displayed on that page.
 
-### 1. Attribution Dashboard (Home)
-- **Summary cards** at the top showing:
-  - Total attributed members (current month)
-  - Net change from previous month (+/- count)
-  - New members added this month
-  - Members removed this month
-- **Attribution trend mini-chart** showing member count over last 6 months
-- **Change highlights section** showing the most recent additions and removals with reasons (e.g., "New enrollment," "PCP selection," "Moved out of area," "Coverage terminated," "Reassigned to different provider")
+## What You Will See
 
-### 2. Patient Panel (Member List)
-A searchable, filterable table of all attributed members with columns:
-- **Patient name & demographics** (age, gender)
-- **Member ID / Subscriber ID**
-- **Attributed Provider** (name, NPI)
-- **Plan / Contract** (plan name, payer, contract ID)
-- **Attribution Period** (start/end dates)
-- **Attribution Status** (active, pending, removed)
-- **Change indicator** — badge showing "New," "Returning," or nothing for unchanged members
+- A collapsible section at the bottom of each page with a code bracket icon and "FHIR Inspector" label
+- Collapsed by default to keep pages clean
+- When expanded, shows syntax-highlighted JSON representing the FHIR resources used on that page
+- Each page shows contextually relevant resources:
+  - **Dashboard (Index)**: The ATR Group resource with member entries for added/dropped members, plus projected data
+  - **Patient Panel**: The full ATR Group resource with all filtered members as Group.member entries
+  - **Member Detail**: Individual Patient, Coverage, Practitioner, and Group.member entry resources for that specific member
 
-Filters for:
-- Attribution status (active, new this month, removed)
-- Plan/payer
-- Attributed provider
-- Search by patient name or member ID
+## Technical Details
 
-### 3. Member Detail View
-Clicking a patient row opens a detail panel/page showing:
-- Full patient demographics
-- Coverage information (plan, subscriber info, enrollment dates)
-- Attributed provider details (name, NPI, TIN, specialty)
-- Attribution history timeline (when attributed, any changes, prior attributions)
-- Change reason if newly added or removed
+### New Component: `src/components/FhirInspector.tsx`
+- Accepts a `data` prop (any object/array) and an optional `title` string
+- Uses the existing Collapsible component from Radix UI
+- Renders `JSON.stringify(data, null, 2)` inside a styled `<pre>` block with monospace font, dark background, and horizontal scroll
+- Includes a copy-to-clipboard button using the Clipboard API
 
-### 4. Monthly Changes View
-A dedicated view comparing current vs. previous month:
-- **Added members** table with reason for addition (new enrollment, PCP change, manual add, algorithm-based)
-- **Removed members** table with reason for removal (disenrollment, moved, reassigned, coverage ended)
-- **Summary statistics** of churn
+### New Utility: `src/lib/fhir-transforms.ts`
+- `memberToFhirPatient(member)` -- converts a Member to a FHIR Patient resource skeleton
+- `memberToFhirCoverage(member)` -- converts to a FHIR Coverage resource
+- `providerToFhirPractitioner(provider)` -- converts to a FHIR Practitioner resource
+- `membersToAtrGroup(members, attributionList)` -- converts the member list + attribution metadata into a Da Vinci ATR Group resource with proper extensions (`ext-changeType`, `ext-attributedProvider`, member periods, `ext-attributionListStatus`, `ext-contractValidityPeriod`)
 
-## Mock Data
-All data will be realistic, FHIR-aligned mock data representing ~50 attributed patients across 2-3 plans/contracts, with ~8 new and ~5 removed members to demonstrate the diff functionality. Patient names, NPIs, member IDs, and dates will be realistic but fictional.
+### Page Updates
+- **Index.tsx**: Add `<FhirInspector>` at the bottom with the ATR Group JSON built from displayed members (new + dropped) and projections
+- **PatientPanel.tsx**: Add `<FhirInspector>` with the ATR Group JSON built from the current filtered member set
+- **MemberDetail.tsx**: Add `<FhirInspector>` with a FHIR Bundle containing Patient, Coverage, Practitioner, and the Group.member entry for that member
 
-## Design
-- Clean, professional healthcare dashboard aesthetic
-- Light color scheme with subtle blue/teal accent colors
-- Status badges with intuitive color coding (green for new, red for removed, blue for active)
-- Responsive layout suitable for desktop use
